@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +61,9 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public Optional<Task> add(Task task) {
-        return Optional.empty();
+        task.setCreated(LocalDateTime.now());
+        task.setDone(false);
+        return repository.add(task);
     }
 
     /**
