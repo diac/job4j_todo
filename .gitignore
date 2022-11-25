@@ -5,3 +5,4 @@ target
 /testdb.trace.db
 /src/main/resources/db.properties
 /db/liquibase.properties
+/src/main/resources/hibernate.cfg.xml
