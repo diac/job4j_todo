@@ -23,4 +23,18 @@ public class TaskController {
         model.addAttribute("tasks", tasks);
         return "tasks/index";
     }
+
+    @GetMapping("/tasks/completed")
+    public String completedIndex(Model model) {
+        List<Task> tasks = taskService.findAllByDone(true);
+        model.addAttribute("tasks", tasks);
+        return "tasks/index";
+    }
+
+    @GetMapping("/tasks/new")
+    public String nonCompletedIndex(Model model) {
+        List<Task> tasks = taskService.findAllByDone(false);
+        model.addAttribute("tasks", tasks);
+        return "tasks/index";
+    }
 }

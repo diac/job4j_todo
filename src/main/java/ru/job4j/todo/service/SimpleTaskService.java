@@ -37,7 +37,7 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public List<Task> findAllByDone(boolean done) {
-        return null;
+        return repository.findAllByDone(done);
     }
 
     /**
