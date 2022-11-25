@@ -50,7 +50,7 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public Optional<Task> findById(int id) {
-        return Optional.empty();
+        return repository.findById(id);
     }
 
     /**
@@ -74,7 +74,7 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public boolean update(Task task) {
-        return false;
+        return repository.update(task);
     }
 
     /**
@@ -85,6 +85,6 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public boolean delete(Task task) {
-        return false;
+        return repository.delete(task);
     }
 }
