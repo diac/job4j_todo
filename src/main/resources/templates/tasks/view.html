@@ -19,8 +19,9 @@
 
         <a th:href="@{/tasks/__${id}__/edit}" class="btn btn-primary">Отредактировать</a>
         <form
-                method="post"
-                th:action="@{/tasks/__${id}__/complete}"
+                th:method="delete"
+                th:action="@{/tasks/__${id}__}"
+                onsubmit="return confirm('Удалить задачу?')"
         >
             <button
                     type="submit"

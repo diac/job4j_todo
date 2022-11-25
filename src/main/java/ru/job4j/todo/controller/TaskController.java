@@ -106,4 +106,17 @@ public class TaskController {
         }
         return "redirect:/";
     }
+
+    @DeleteMapping("/tasks/{id}")
+    public String delete(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
+        Optional<Task> task = taskService.findById(id);
+        if (task.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
+        } else if (taskService.delete(task.get())) {
+            redirectAttributes.addFlashAttribute("successMessage", "Задача удалена");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось удалить задачу");
+        }
+        return "redirect:/";
+    }
 }
