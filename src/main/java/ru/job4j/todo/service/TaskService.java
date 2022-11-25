@@ -18,4 +18,6 @@ public interface TaskService {
     boolean update(Task task);
 
     boolean delete(Task task);
+
+    boolean complete(Task task);
 }

@@ -9,6 +9,11 @@
             th:text="${errorMessage}"
             class="alert alert-danger"
     ></div>
+    <div
+            th:if="${successMessage != null}"
+            th:text="${successMessage}"
+            class="alert alert-success"
+    ></div>
     <h1>Задачи</h1>
     <div class="btn-group">
         <a href="/" class="btn btn-link">Все</a>

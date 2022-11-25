@@ -87,4 +87,16 @@ public class SimpleTaskService implements TaskService {
     public boolean delete(Task task) {
         return repository.delete(task);
     }
+
+    /**
+     * Отметить задачу Task как выполненную и сохранить соответствующий объект в репозитории
+     *
+     * @param task Задача, которая будет помечена как выполненная
+     * @return true в случае успешного удаления. Иначе -- false
+     */
+    @Override
+    public boolean complete(Task task) {
+        task.setDone(true);
+        return repository.update(task);
+    }
 }

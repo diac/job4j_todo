@@ -5,10 +5,29 @@
 <div class="container">
     <nav th:replace="fragments/navbar :: navbarMain"></nav>
     <article th:text="${task.getDescription()}" class="mb-4"></article>
-    <div class="btn-group">
-        <button type="button" class="btn btn-success">Выполнено</button>
-        <button type="button" class="btn btn-primary">Отредактировать</button>
-        <button type="button" class="btn btn-danger">Удалить</button>
+    <div class="btn-group" th:with="id = ${task.getId()}">
+        <form
+                method="post"
+                th:action="@{/tasks/__${id}__/complete}"
+        >
+            <button
+                    type="submit"
+                    class="btn btn-success"
+                    style="border-top-right-radius: 0px; border-bottom-right-radius: 0px;"
+            >Выполнено</button>
+        </form>
+
+        <a th:href="@{tasks/__${id}__/edit}" class="btn btn-primary">Отредактировать</a>
+        <form
+                method="post"
+                th:action="@{/tasks/__${id}__/complete}"
+        >
+            <button
+                    type="submit"
+                    class="btn btn-danger"
+                    style="border-top-left-radius: 0px; border-bottom-left-radius: 0px;"
+            >Удалить</button>
+        </form>
     </div>
 </div>
 </body>

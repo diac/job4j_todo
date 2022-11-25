@@ -65,4 +65,17 @@ public class TaskController {
         model.addAttribute("task", task.get());
         return "tasks/view";
     }
+
+    @PostMapping("/tasks/{id}/complete")
+    public String complete(@PathVariable("id") int id,  RedirectAttributes redirectAttributes) {
+        Optional<Task> task = taskService.findById(id);
+        if (task.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
+        } else if (taskService.complete(task.get())) {
+            redirectAttributes.addFlashAttribute("successMessage", "Задача отмечена как завершенная");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить статус задачи");
+        }
+        return "redirect:/";
+    }
 }
