@@ -1,4 +1,4 @@
-jdbc.url=jdbc:postgresql://hostname:port/db_name
-jdbc.username=db_username
-jdbc.password=db_password
-jdbc.driver=org.postgresql.Driver
+changeLogFile: db/master.xml
+url: jdbc:postgresql://hostname:port/db_name
+username: db_username
+password: db_password
