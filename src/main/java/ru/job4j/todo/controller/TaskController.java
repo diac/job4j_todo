@@ -63,7 +63,7 @@ public class TaskController {
         return "tasks/view";
     }
 
-    @PostMapping("/tasks/{id}/complete")
+    @PatchMapping("/tasks/{id}/complete")
     public String complete(@PathVariable("id") int id,  RedirectAttributes redirectAttributes) {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {

@@ -7,7 +7,7 @@
     <article th:text="${task.getDescription()}" class="mb-4"></article>
     <div class="btn-group" th:with="id = ${task.getId()}">
         <form
-                method="post"
+                th:method="patch"
                 th:action="@{/tasks/__${id}__/complete}"
         >
             <button
