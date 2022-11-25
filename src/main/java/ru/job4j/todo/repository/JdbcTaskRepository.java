@@ -25,6 +25,8 @@ public class JdbcTaskRepository implements TaskRepository {
 
     private static final String FIND_ALL_QUERY = "SELECT t FROM Task t";
 
+    private static final String FIND_ALL_BY_DONE_QUERY = "SELECT t FROM Task t WHERE done = :fDone";
+
     private static final String FIND_BY_ID_QUERY = "SELECT t FROM Task t WHERE id = :fId";
 
     private static final String UPDATE_QUERY = """
@@ -44,7 +46,7 @@ public class JdbcTaskRepository implements TaskRepository {
     /**
      * Получить все записи для модели Task из БД
      *
-     * @return Список сеансов. Пустой список, если ничего не найдено
+     * @return Список задач. Пустой список, если ничего не найдено
      */
     @Override
     public List<Task> findAll() {
@@ -54,6 +56,30 @@ public class JdbcTaskRepository implements TaskRepository {
                 session.beginTransaction();
                 Query<Task> query = session.createQuery(FIND_ALL_QUERY);
                 tasks = query.getResultList();
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                session.getTransaction().rollback();
+            }
+        }
+        return tasks;
+    }
+
+    /**
+     * Получить все записи для модели Task из БД, отфильтрованные по передаваемому значению done
+     *
+     * @param done Значение поля done для объектов Task (true -- для выполненных, false -- для невыполненных)
+     * @return Список задач. Пустой список, если ничего не найдено
+     */
+    @Override
+    public List<Task> findAllByDone(boolean done) {
+        List<Task> tasks = new ArrayList<>();
+        try (Session session = sf.openSession()) {
+            try {
+                session.beginTransaction();
+                Query<Task> query = session.createQuery(FIND_ALL_BY_DONE_QUERY)
+                        .setParameter("fDone", done);
+                tasks = query.getResultList();
+                session.getTransaction().commit();
             } catch (HibernateException e) {
                 session.getTransaction().rollback();
             }
@@ -76,6 +102,7 @@ public class JdbcTaskRepository implements TaskRepository {
                 Query<Task> query = session.createQuery(FIND_BY_ID_QUERY)
                         .setParameter("fId", id);
                 result = Optional.of(query.getSingleResult());
+                session.getTransaction().commit();
             } catch (NoResultException nre) {
                 result = Optional.empty();
             } catch (HibernateException e) {

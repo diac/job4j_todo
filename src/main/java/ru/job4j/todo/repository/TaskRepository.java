@@ -9,6 +9,8 @@ public interface TaskRepository {
 
     List<Task> findAll();
 
+    List<Task> findAllByDone(boolean done);
+
     Optional<Task> findById(int id);
 
     Optional<Task> add(Task task);

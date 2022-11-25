@@ -7,6 +7,7 @@ import ru.job4j.todo.Main;
 import ru.job4j.todo.model.Task;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -50,5 +51,16 @@ public class JdbcTaskRepositoryTest {
         int taskId = task.getId();
         repository.delete(task);
         assertThat(repository.findById(taskId)).isEmpty();
+    }
+
+    @Test
+    public void whenFindAllByDone() {
+        String taskDescription = String.valueOf(System.currentTimeMillis());
+        Task task = new Task(0, taskDescription, LocalDateTime.now(), true);
+        repository.add(task);
+        List<Task> tasks = repository.findAllByDone(true);
+        System.out.println(tasks);
+        System.out.println(tasks.contains(task));
+        assertThat(tasks.contains(task)).isTrue();
     }
 }
