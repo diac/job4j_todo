@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
@@ -75,6 +72,37 @@ public class TaskController {
             redirectAttributes.addFlashAttribute("successMessage", "Задача отмечена как завершенная");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить статус задачи");
+        }
+        return "redirect:/";
+    }
+
+    @GetMapping("/tasks/{id}/edit")
+    public String edit(@PathVariable("id") int id,  Model model, RedirectAttributes redirectAttributes) {
+        Optional<Task> task = taskService.findById(id);
+        if (task.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
+            return "redirect:/";
+        }
+        model.addAttribute("task", task.get());
+        return "tasks/edit";
+    }
+
+    @PatchMapping("/tasks/{id}")
+    public String patch(
+            @ModelAttribute("task") Task task,
+            @PathVariable("id") int id,
+            RedirectAttributes redirectAttributes
+    ) {
+        Optional<Task> storedTask = taskService.findById(id);
+        if (storedTask.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
+            return "redirect:/";
+        }
+        storedTask.get().setDescription(task.getDescription());
+        if (taskService.update(storedTask.get())) {
+            redirectAttributes.addFlashAttribute("successMessage", "Задача обновлена");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить задачу");
         }
         return "redirect:/";
     }

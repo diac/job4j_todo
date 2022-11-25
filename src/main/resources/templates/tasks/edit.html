@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: htmlHead"></head>
+<body>
+<div class="container">
+    <h1>Новая задача</h1>
+    <form
+            th:object="${task}"
+            th:with="id = ${task.getId()}"
+            th:method="patch"
+            th:action="@{/tasks/__${id}__}"
+    >
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <input id="description" class="form-control" th:field="*{description}" required>
+        </div>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </form>
+</div>
+</body>
+</html>
