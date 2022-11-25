@@ -1,6 +1,7 @@
 package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
+import net.jcip.annotations.ThreadSafe;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,8 +19,9 @@ import java.util.Optional;
  * Репозиторий, отвечающий за сериализацию/десериализацию объектов модели Task в БД
  */
 @Repository
+@ThreadSafe
 @AllArgsConstructor
-public class TaskDBRepository implements TaskRepository {
+public class JdbcTaskRepository implements TaskRepository {
 
     private static final String FIND_ALL_QUERY = "SELECT t FROM Task t";
 

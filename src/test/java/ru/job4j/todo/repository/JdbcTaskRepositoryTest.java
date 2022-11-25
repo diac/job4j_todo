@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(classes = {Main.class, TaskDBRepository.class})
-public class TaskDBRepositoryTest {
+@SpringBootTest(classes = {Main.class, JdbcTaskRepository.class})
+public class JdbcTaskRepositoryTest {
 
     @Autowired
     private TaskRepository repository;
