@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: htmlHead"></head>
+<body>
+<div class="container">
+    <nav th:replace="fragments/navbar :: navbarMain"></nav>
+    <article th:text="${task.getDescription()}" class="mb-4"></article>
+    <div class="btn-group">
+        <button type="button" class="btn btn-success">Выполнено</button>
+        <button type="button" class="btn btn-primary">Отредактировать</button>
+        <button type="button" class="btn btn-danger">Удалить</button>
+    </div>
+</div>
+</body>
+</html>
