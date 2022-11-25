@@ -30,6 +30,17 @@ public class SimpleTaskService implements TaskService {
     }
 
     /**
+     * Получить все объекты для модели Task из репозитория, отфильтрованные по передаваемому значению done
+     *
+     * @param done Значение поля done для объектов Task (true -- для выполненных, false -- для невыполненных)
+     * @return Список задач. Пустой список, если ничего не найдено
+     */
+    @Override
+    public List<Task> findAllByDone(boolean done) {
+        return null;
+    }
+
+    /**
      * Получить один объект Task из репозитория по id
      *
      * @param id Уникальный идентификатор объекта Task
