@@ -18,4 +18,6 @@ public interface TaskRepository {
     boolean update(Task task);
 
     boolean delete(Task task);
+
+    boolean setDone(Task task, boolean done);
 }

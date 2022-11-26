@@ -96,7 +96,6 @@ public class SimpleTaskService implements TaskService {
      */
     @Override
     public boolean complete(Task task) {
-        task.setDone(true);
-        return repository.update(task);
+        return repository.setDone(task, true);
     }
 }

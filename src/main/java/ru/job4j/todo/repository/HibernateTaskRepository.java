@@ -38,6 +38,8 @@ public class HibernateTaskRepository implements TaskRepository {
             WHERE
                 id = :fId""";
 
+    private static final String UPDATE_DONE_BY_ID_QUERY = "UPDATE Task SET done = :fDone WHERE id = :fId";
+
     private static final String DELETE_QUERY = "DELETE FROM Task WHERE id = :fId";
 
     private final SessionFactory sf;
@@ -172,6 +174,30 @@ public class HibernateTaskRepository implements TaskRepository {
                 session.beginTransaction();
                 Query query = session.createQuery(DELETE_QUERY)
                         .setParameter("fId", task.getId());
+                result = query.executeUpdate() > 0;
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                session.getTransaction().rollback();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Установить значение поля done для объекта Task
+     *
+     * @param task Объект Task, для которого нужно обновить поле done
+     * @param done Новое значение поля done
+     * @return true в случае успешного обновления, иначе -- false
+     */
+    public boolean setDone(Task task, boolean done) {
+        boolean result = false;
+        try (Session session = sf.openSession()) {
+            try {
+                session.beginTransaction();
+                Query query = session.createQuery(UPDATE_DONE_BY_ID_QUERY)
+                        .setParameter("fId", task.getId())
+                        .setParameter("fDone", done);
                 result = query.executeUpdate() > 0;
                 session.getTransaction().commit();
             } catch (HibernateException e) {

@@ -59,8 +59,18 @@ public class HibernateTaskRepositoryTest {
         Task task = new Task(0, taskDescription, LocalDateTime.now(), true);
         repository.add(task);
         List<Task> tasks = repository.findAllByDone(true);
-        System.out.println(tasks);
-        System.out.println(tasks.contains(task));
         assertThat(tasks.contains(task)).isTrue();
+    }
+
+    @Test
+    public void whenSetDone() {
+        Task task = new Task(0, null, LocalDateTime.now(), true);
+        repository.add(task);
+        boolean done = task.isDone();
+        repository.setDone(task, false);
+        Task taskInDb = repository.findById(task.getId())
+                .orElse(new Task(0, null, LocalDateTime.now(), false));
+        assertThat(task).isEqualTo(taskInDb);
+        assertThat(done).isNotEqualTo(taskInDb.isDone());
     }
 }
