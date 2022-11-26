@@ -15,44 +15,45 @@ import java.util.Optional;
 @Controller
 @ThreadSafe
 @AllArgsConstructor
+@RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskService taskService;
 
-    @GetMapping("/")
+    @GetMapping()
     public String index(Model model) {
         List<Task> tasks = taskService.findAll();
         model.addAttribute("tasks", tasks);
         return "tasks/index";
     }
 
-    @GetMapping("/tasks/completed")
+    @GetMapping("/completed")
     public String completedIndex(Model model) {
         List<Task> tasks = taskService.findAllByDone(true);
         model.addAttribute("tasks", tasks);
         return "tasks/index";
     }
 
-    @GetMapping("/tasks/incomplete")
+    @GetMapping("/incomplete")
     public String incompleteIndex(Model model) {
         List<Task> tasks = taskService.findAllByDone(false);
         model.addAttribute("tasks", tasks);
         return "tasks/index";
     }
 
-    @GetMapping("/tasks/new")
+    @GetMapping("/new")
     public String create(Model model) {
         model.addAttribute("task", new Task());
         return "tasks/create";
     }
 
-    @PostMapping("/tasks")
+    @PostMapping()
     public String store(@ModelAttribute Task task) {
         taskService.add(task);
         return "redirect:/";
     }
 
-    @GetMapping("/tasks/{id}")
+    @GetMapping("/{id}")
     public String view(@PathVariable("id") int id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {
@@ -63,7 +64,7 @@ public class TaskController {
         return "tasks/view";
     }
 
-    @PatchMapping("/tasks/{id}/complete")
+    @PatchMapping("/{id}/complete")
     public String complete(@PathVariable("id") int id,  RedirectAttributes redirectAttributes) {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {
@@ -76,7 +77,7 @@ public class TaskController {
         return "redirect:/";
     }
 
-    @GetMapping("/tasks/{id}/edit")
+    @GetMapping("/{id}/edit")
     public String edit(@PathVariable("id") int id,  Model model, RedirectAttributes redirectAttributes) {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {
@@ -87,7 +88,7 @@ public class TaskController {
         return "tasks/edit";
     }
 
-    @PatchMapping("/tasks/{id}")
+    @PatchMapping("/{id}")
     public String patch(
             @ModelAttribute("task") Task task,
             @PathVariable("id") int id,
@@ -107,7 +108,7 @@ public class TaskController {
         return "redirect:/";
     }
 
-    @DeleteMapping("/tasks/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {
