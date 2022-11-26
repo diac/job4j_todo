@@ -21,7 +21,7 @@ import java.util.Optional;
 @Repository
 @ThreadSafe
 @AllArgsConstructor
-public class JdbcTaskRepository implements TaskRepository {
+public class HibernateTaskRepository implements TaskRepository {
 
     private static final String FIND_ALL_QUERY = "SELECT t FROM Task t";
 

@@ -11,8 +11,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(classes = {Main.class, JdbcTaskRepository.class})
-public class JdbcTaskRepositoryTest {
+@SpringBootTest(classes = {Main.class, HibernateTaskRepository.class})
+public class HibernateTaskRepositoryTest {
 
     @Autowired
     private TaskRepository repository;
