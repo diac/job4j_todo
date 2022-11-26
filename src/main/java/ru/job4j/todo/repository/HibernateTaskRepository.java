@@ -34,7 +34,6 @@ public class HibernateTaskRepository implements TaskRepository {
                 Task
             SET
                 description = :fDescription,
-                created = :fCreated,
                 done = :fDone
             WHERE
                 id = :fId""";
@@ -149,7 +148,6 @@ public class HibernateTaskRepository implements TaskRepository {
                 Query query = session.createQuery(UPDATE_QUERY)
                         .setParameter("fId", task.getId())
                         .setParameter("fDescription", task.getDescription())
-                        .setParameter("fCreated", task.getCreated())
                         .setParameter("fDone", task.isDone());
                 result = query.executeUpdate() > 0;
                 session.getTransaction().commit();
