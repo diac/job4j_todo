@@ -19,5 +19,13 @@ public interface TaskRepository {
 
     boolean delete(Task task);
 
+    boolean deleteById(int id);
+
+    boolean setDescriptionById(int id, String description);
+
+    boolean setDescription(Task task, String description);
+
+    boolean setDoneById(int id, boolean done);
+
     boolean setDone(Task task, boolean done);
 }

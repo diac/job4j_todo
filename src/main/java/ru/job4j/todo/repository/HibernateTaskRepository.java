@@ -38,6 +38,8 @@ public class HibernateTaskRepository implements TaskRepository {
             WHERE
                 id = :fId""";
 
+    private static final String UPDATE_DESCRIPTION_BY_ID_QUERY = "UPDATE Task SET description = :fDescription WHERE id = :fId";
+
     private static final String UPDATE_DONE_BY_ID_QUERY = "UPDATE Task SET done = :fDone WHERE id = :fId";
 
     private static final String DELETE_QUERY = "DELETE FROM Task WHERE id = :fId";
@@ -184,7 +186,105 @@ public class HibernateTaskRepository implements TaskRepository {
     }
 
     /**
-     * Установить значение поля done для объекта Task
+     * Удалить из БД запись, по id объекта Task в репозитории
+     *
+     * @param id Объект Task, для которого необходимо удалить запись из БД
+     * @return true в случае успешного удаления. Иначе -- false
+     */
+    @Override
+    public boolean deleteById(int id) {
+        boolean result = false;
+        try (Session session = sf.openSession()) {
+            try {
+                session.beginTransaction();
+                Query query = session.createQuery(DELETE_QUERY)
+                        .setParameter("fId", id);
+                result = query.executeUpdate() > 0;
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                session.getTransaction().rollback();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Обновить значение поля description для объекта Task в репозитории по id
+     *
+     * @param id Значение поля id объекта Task, для которого нужно обновить поле description
+     * @param description Новое значение поля description
+     * @return true в случае успешного обновления, иначе -- false
+     */
+    @Override
+    public boolean setDescriptionById(int id, String description) {
+        boolean result = false;
+        try (Session session = sf.openSession()) {
+            try {
+                session.beginTransaction();
+                Query query = session.createQuery(UPDATE_DESCRIPTION_BY_ID_QUERY)
+                        .setParameter("fId", id)
+                        .setParameter("fDescription", description);
+                result = query.executeUpdate() > 0;
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                session.getTransaction().rollback();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Обновить значение поля description для объекта Task
+     *
+     * @param task Объект Task, для которого нужно обновить поле description
+     * @param description Новое значение поля description
+     * @return true в случае успешного обновления, иначе -- false
+     */
+    @Override
+    public boolean setDescription(Task task, String description) {
+        boolean result = false;
+        try (Session session = sf.openSession()) {
+            try {
+                session.beginTransaction();
+                Query query = session.createQuery(UPDATE_DESCRIPTION_BY_ID_QUERY)
+                        .setParameter("fId", task.getId())
+                        .setParameter("fDescription", description);
+                result = query.executeUpdate() > 0;
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                session.getTransaction().rollback();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Обновить значение поля done для объекта Task в репозитории по id
+     *
+     * @param id Значение поля id объекта Task, для которого нужно обновить поле done
+     * @param done Новое значение поля done
+     * @return true в случае успешного обновления, иначе -- false
+     */
+    @Override
+    public boolean setDoneById(int id, boolean done) {
+        boolean result = false;
+        try (Session session = sf.openSession()) {
+            try {
+                session.beginTransaction();
+                Query query = session.createQuery(UPDATE_DONE_BY_ID_QUERY)
+                        .setParameter("fId", id)
+                        .setParameter("fDone", done);
+                result = query.executeUpdate() > 0;
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                session.getTransaction().rollback();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Обновить значение поля done для объекта Task
      *
      * @param task Объект Task, для которого нужно обновить поле done
      * @param done Новое значение поля done

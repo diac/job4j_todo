@@ -19,5 +19,11 @@ public interface TaskService {
 
     boolean delete(Task task);
 
+    boolean deleteById(int id);
+
+    boolean updateDescriptionById(int id, String description);
+
     boolean complete(Task task);
+
+    boolean completeById(int id);
 }

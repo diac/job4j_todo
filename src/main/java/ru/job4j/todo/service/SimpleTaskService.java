@@ -89,13 +89,46 @@ public class SimpleTaskService implements TaskService {
     }
 
     /**
+     * Удалить из репозитория объект, по значению поля id объекта Task
+     *
+     * @param id Значение поля id объекта Task, который необходимо удалить из репозитория
+     * @return true в случае успешного удаления. Иначе -- false
+     */
+    @Override
+    public boolean deleteById(int id) {
+        return repository.deleteById(id);
+    }
+
+    /**
+     * Обновить значение поля description объекта Task по id
+     * @param id Значение поля id объекта Task
+     * @param description Новое значение поля description
+     * @return true в случае успешного обновления поля. Иначе -- false
+     */
+    @Override
+    public boolean updateDescriptionById(int id, String description) {
+        return repository.setDescriptionById(id, description);
+    }
+
+    /**
      * Отметить задачу Task как выполненную и сохранить соответствующий объект в репозитории
      *
      * @param task Задача, которая будет помечена как выполненная
-     * @return true в случае успешного удаления. Иначе -- false
+     * @return true в случае успешного обновления поля. Иначе -- false
      */
     @Override
     public boolean complete(Task task) {
         return repository.setDone(task, true);
+    }
+
+    /**
+     * Отметить задачу Task как выполненную по id и сохранить соответствующий объект в репозитории
+     *
+     * @param id Значение поля id для объекта Task
+     * @return true в случае успешного обновления поля. Иначе -- false
+     */
+    @Override
+    public boolean completeById(int id) {
+        return repository.setDoneById(id, true);
     }
 }

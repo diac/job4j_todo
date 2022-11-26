@@ -50,7 +50,7 @@ public class TaskController {
     @PostMapping()
     public String store(@ModelAttribute Task task) {
         taskService.add(task);
-        return "redirect:/";
+        return "redirect:/tasks";
     }
 
     @GetMapping("/{id}")
@@ -58,7 +58,7 @@ public class TaskController {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
-            return "redirect:/";
+            return "redirect:/tasks";
         }
         model.addAttribute("task", task.get());
         return "tasks/view";
@@ -66,15 +66,12 @@ public class TaskController {
 
     @PatchMapping("/{id}/complete")
     public String complete(@PathVariable("id") int id,  RedirectAttributes redirectAttributes) {
-        Optional<Task> task = taskService.findById(id);
-        if (task.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
-        } else if (taskService.complete(task.get())) {
+        if (taskService.completeById(id)) {
             redirectAttributes.addFlashAttribute("successMessage", "Задача отмечена как завершенная");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить статус задачи");
         }
-        return "redirect:/";
+        return "redirect:/tasks";
     }
 
     @GetMapping("/{id}/edit")
@@ -82,7 +79,7 @@ public class TaskController {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
-            return "redirect:/";
+            return "redirect:/tasks";
         }
         model.addAttribute("task", task.get());
         return "tasks/edit";
@@ -94,30 +91,21 @@ public class TaskController {
             @PathVariable("id") int id,
             RedirectAttributes redirectAttributes
     ) {
-        Optional<Task> storedTask = taskService.findById(id);
-        if (storedTask.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
-            return "redirect:/";
-        }
-        storedTask.get().setDescription(task.getDescription());
-        if (taskService.update(storedTask.get())) {
+        if (taskService.updateDescriptionById(id, task.getDescription())) {
             redirectAttributes.addFlashAttribute("successMessage", "Задача обновлена");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить задачу");
         }
-        return "redirect:/";
+        return "redirect:/tasks";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
-        Optional<Task> task = taskService.findById(id);
-        if (task.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
-        } else if (taskService.delete(task.get())) {
+        if (taskService.deleteById(id)) {
             redirectAttributes.addFlashAttribute("successMessage", "Задача удалена");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Не удалось удалить задачу");
         }
-        return "redirect:/";
+        return "redirect:/tasks";
     }
 }
