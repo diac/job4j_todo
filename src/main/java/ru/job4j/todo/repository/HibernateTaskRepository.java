@@ -100,7 +100,7 @@ public class HibernateTaskRepository implements TaskRepository {
                 session.beginTransaction();
                 Query<Task> query = session.createQuery(FIND_BY_ID_QUERY)
                         .setParameter("fId", id);
-                result = Optional.of(query.getSingleResult());
+                result = query.uniqueResultOptional();
                 session.getTransaction().commit();
             } catch (NoResultException nre) {
                 result = Optional.empty();
