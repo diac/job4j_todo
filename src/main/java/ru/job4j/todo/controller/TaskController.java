@@ -20,7 +20,7 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @GetMapping()
+    @GetMapping("")
     public String index(Model model) {
         List<Task> tasks = taskService.findAll();
         model.addAttribute("tasks", tasks);
@@ -47,7 +47,7 @@ public class TaskController {
         return "tasks/create";
     }
 
-    @PostMapping()
+    @PostMapping("/create")
     public String store(@ModelAttribute Task task) {
         taskService.add(task);
         return "redirect:/tasks";
