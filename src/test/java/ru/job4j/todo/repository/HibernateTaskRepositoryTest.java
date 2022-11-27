@@ -3,15 +3,15 @@ package ru.job4j.todo.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.job4j.todo.Main;
+import ru.job4j.todo.config.DataSourceConfig;
 import ru.job4j.todo.model.Task;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {Main.class, HibernateTaskRepository.class})
+@SpringBootTest(classes = {DataSourceConfig.class, HibernateTaskRepository.class})
 public class HibernateTaskRepositoryTest {
 
     @Autowired
