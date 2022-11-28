@@ -126,7 +126,7 @@ public class HibernateUserRepository implements UserRepository {
         Optional<User> result = Optional.empty();
         try (Session session = sf.openSession()) {
             try {
-                session.getTransaction();
+                session.beginTransaction();
                 Query<User> query = session.createQuery(FIND_BY_LOGIN_AND_PASSWORD_QUERY)
                         .setParameter("fLogin", login)
                         .setParameter("fPassword", password);
