@@ -116,7 +116,7 @@ public class HibernateTaskRepository implements TaskRepository {
      * Добавить новую запись в БД из объекта Task
      *
      * @param task Объект Task из которого создается новая запись в БД
-     * @return Optional оъекта Task, соответствующего новой созданной записи в БД.
+     * @return Optional объекта Task, соответствующего новой созданной записи в БД.
      * Optional.empty() в случае, если новую запись не удалось создать (напр., из-за нарушения
      * ссылочной целостности)
      */
@@ -135,7 +135,7 @@ public class HibernateTaskRepository implements TaskRepository {
     }
 
     /**
-     * Обновить в БД запись, соотвутетсвующую передаваемому объекту Task
+     * Обновить в БД запись, соответсвующую передаваемому объекту Task
      *
      * @param task Объект Task, для которого необходимо обновить запись в БД
      * @return true в случае успешного обновления. Иначе -- false
