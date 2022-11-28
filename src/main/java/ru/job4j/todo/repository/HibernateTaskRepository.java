@@ -185,7 +185,7 @@ public class HibernateTaskRepository implements TaskRepository {
     /**
      * Удалить из БД запись, по id объекта Task в репозитории
      *
-     * @param id Объект Task, для которого необходимо удалить запись из БД
+     * @param id Идентификатор объекта Task, для которого необходимо удалить запись из БД
      * @return true в случае успешного удаления. Иначе -- false
      */
     @Override
