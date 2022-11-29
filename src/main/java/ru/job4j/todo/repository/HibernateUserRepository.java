@@ -2,16 +2,11 @@ package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
 
-import javax.persistence.PersistenceException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -31,20 +26,9 @@ public class HibernateUserRepository implements UserRepository {
     private static final String FIND_BY_LOGIN_AND_PASSWORD_QUERY
             = "SELECT u FROM User u WHERE login = :fLogin AND password = :fPassword";
 
-    private static final String UPDATE_QUERY = """
-            UPDATE
-                User
-            SET
-                name = :fName,
-                login = :fLogin,
-                password = :fPassword
-            WHERE
-                id = :fId
-            """;
-
     private static final String DELETE_QUERY = "DELETE FROM User WHERE id = :fId";
 
-    private final SessionFactory sf;
+    private final CrudRepository crudRepository;
 
     /**
      * Получить все записи для модели User из БД
@@ -53,18 +37,7 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query<User> query = session.createQuery(FIND_ALL_QUERY);
-                users = query.getResultList();
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return users;
+        return crudRepository.query(FIND_ALL_QUERY, User.class);
     }
 
     /**
@@ -75,19 +48,11 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public Optional<User> findById(int id) {
-        Optional<User> result = Optional.empty();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query<User> query = session.createQuery(FIND_BY_ID_QUERY)
-                        .setParameter("fId", id);
-                result = query.uniqueResultOptional();
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.optional(
+                FIND_BY_ID_QUERY,
+                User.class,
+                Map.of("fId", id)
+        );
     }
 
     /**
@@ -99,19 +64,11 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public Optional<User> findByLogin(String login) {
-        Optional<User> result = Optional.empty();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query<User> query = session.createQuery(FIND_BY_LOGIN_QUERY)
-                        .setParameter("fLogin", login);
-                result = query.uniqueResultOptional();
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.optional(
+                FIND_BY_LOGIN_QUERY,
+                User.class,
+                Map.of("fLogin", login)
+        );
     }
 
     /**
@@ -124,20 +81,14 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public Optional<User> findByLoginAndPassword(String login, String password) {
-        Optional<User> result = Optional.empty();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query<User> query = session.createQuery(FIND_BY_LOGIN_AND_PASSWORD_QUERY)
-                        .setParameter("fLogin", login)
-                        .setParameter("fPassword", password);
-                result = query.uniqueResultOptional();
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.optional(
+                FIND_BY_LOGIN_AND_PASSWORD_QUERY,
+                User.class,
+                Map.of(
+                        "fLogin", login,
+                        "fPassword", password
+                )
+        );
     }
 
     /**
@@ -150,18 +101,10 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public Optional<User> add(User user) {
-        Optional<User> result = Optional.empty();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                session.persist(user);
-                session.getTransaction().commit();
-                result = Optional.of(user);
-            } catch (PersistenceException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.optional(session -> {
+            session.persist(user);
+            return user;
+        });
     }
 
     /**
@@ -172,22 +115,10 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public boolean update(User user) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(UPDATE_QUERY)
-                        .setParameter("fId", user.getId())
-                        .setParameter("fName", user.getName())
-                        .setParameter("fLogin", user.getLogin())
-                        .setParameter("fPassword", user.getPassword());
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(session -> {
+            session.merge(user);
+            return true;
+        });
     }
 
     /**
@@ -198,19 +129,7 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public boolean delete(User user) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(DELETE_QUERY)
-                        .setParameter("fId", user.getId());
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(DELETE_QUERY, Map.of("fId", user.getId()));
     }
 
     /**
@@ -221,18 +140,6 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public boolean deleteById(int id) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(DELETE_QUERY)
-                        .setParameter("fId", id);
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(DELETE_QUERY, Map.of("fId", id));
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {DataSourceConfig.class, HibernateTaskRepository.class})
+@SpringBootTest(classes = {DataSourceConfig.class, HibernateCrudRepository.class, HibernateTaskRepository.class})
 public class HibernateTaskRepositoryTest {
 
     @Autowired

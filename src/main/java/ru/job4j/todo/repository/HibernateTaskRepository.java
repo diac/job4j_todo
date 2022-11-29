@@ -2,15 +2,11 @@ package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Task;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -28,22 +24,13 @@ public class HibernateTaskRepository implements TaskRepository {
 
     private static final String FIND_BY_ID_QUERY = "SELECT t FROM Task t WHERE id = :fId";
 
-    private static final String UPDATE_QUERY = """
-            UPDATE
-                Task
-            SET
-                description = :fDescription,
-                done = :fDone
-            WHERE
-                id = :fId""";
-
     private static final String UPDATE_DESCRIPTION_BY_ID_QUERY = "UPDATE Task SET description = :fDescription WHERE id = :fId";
 
     private static final String UPDATE_DONE_BY_ID_QUERY = "UPDATE Task SET done = :fDone WHERE id = :fId";
 
     private static final String DELETE_QUERY = "DELETE FROM Task WHERE id = :fId";
 
-    private final SessionFactory sf;
+    private final CrudRepository crudRepository;
 
     /**
      * Получить все записи для модели Task из БД
@@ -52,18 +39,7 @@ public class HibernateTaskRepository implements TaskRepository {
      */
     @Override
     public List<Task> findAll() {
-        List<Task> tasks = new ArrayList<>();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query<Task> query = session.createQuery(FIND_ALL_QUERY);
-                tasks = query.getResultList();
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return tasks;
+        return crudRepository.query(FIND_ALL_QUERY, Task.class);
     }
 
     /**
@@ -74,19 +50,11 @@ public class HibernateTaskRepository implements TaskRepository {
      */
     @Override
     public List<Task> findAllByDone(boolean done) {
-        List<Task> tasks = new ArrayList<>();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query<Task> query = session.createQuery(FIND_ALL_BY_DONE_QUERY)
-                        .setParameter("fDone", done);
-                tasks = query.getResultList();
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return tasks;
+        return crudRepository.query(
+                FIND_ALL_BY_DONE_QUERY,
+                Task.class,
+                Map.of("fDone", done)
+        );
     }
 
     /**
@@ -97,19 +65,11 @@ public class HibernateTaskRepository implements TaskRepository {
      */
     @Override
     public Optional<Task> findById(int id) {
-        Optional<Task> result = Optional.empty();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query<Task> query = session.createQuery(FIND_BY_ID_QUERY)
-                        .setParameter("fId", id);
-                result = query.uniqueResultOptional();
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.optional(
+                FIND_BY_ID_QUERY,
+                Task.class,
+                Map.of("fId", id)
+        );
     }
 
     /**
@@ -122,16 +82,10 @@ public class HibernateTaskRepository implements TaskRepository {
      */
     @Override
     public Optional<Task> add(Task task) {
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                session.persist(task);
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return Optional.of(task);
+        return crudRepository.optional(session -> {
+            session.persist(task);
+            return task;
+        });
     }
 
     /**
@@ -142,21 +96,10 @@ public class HibernateTaskRepository implements TaskRepository {
      */
     @Override
     public boolean update(Task task) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(UPDATE_QUERY)
-                        .setParameter("fId", task.getId())
-                        .setParameter("fDescription", task.getDescription())
-                        .setParameter("fDone", task.isDone());
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(session -> {
+            session.merge(task);
+            return true;
+        });
     }
 
     /**
@@ -167,19 +110,7 @@ public class HibernateTaskRepository implements TaskRepository {
      */
     @Override
     public boolean delete(Task task) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(DELETE_QUERY)
-                        .setParameter("fId", task.getId());
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(DELETE_QUERY, Map.of("fId", task.getId()));
     }
 
     /**
@@ -190,94 +121,61 @@ public class HibernateTaskRepository implements TaskRepository {
      */
     @Override
     public boolean deleteById(int id) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(DELETE_QUERY)
-                        .setParameter("fId", id);
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(DELETE_QUERY, Map.of("fId", id));
     }
 
     /**
      * Обновить значение поля description для объекта Task в репозитории по id
      *
-     * @param id Значение поля id объекта Task, для которого нужно обновить поле description
+     * @param id          Значение поля id объекта Task, для которого нужно обновить поле description
      * @param description Новое значение поля description
      * @return true в случае успешного обновления, иначе -- false
      */
     @Override
     public boolean setDescriptionById(int id, String description) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(UPDATE_DESCRIPTION_BY_ID_QUERY)
-                        .setParameter("fId", id)
-                        .setParameter("fDescription", description);
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(
+                UPDATE_DESCRIPTION_BY_ID_QUERY,
+                Map.of(
+                        "fId", id,
+                        "fDescription", description
+                )
+        );
     }
 
     /**
      * Обновить значение поля description для объекта Task
      *
-     * @param task Объект Task, для которого нужно обновить поле description
+     * @param task        Объект Task, для которого нужно обновить поле description
      * @param description Новое значение поля description
      * @return true в случае успешного обновления, иначе -- false
      */
     @Override
     public boolean setDescription(Task task, String description) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(UPDATE_DESCRIPTION_BY_ID_QUERY)
-                        .setParameter("fId", task.getId())
-                        .setParameter("fDescription", description);
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(
+                UPDATE_DESCRIPTION_BY_ID_QUERY,
+                Map.of(
+                        "fId", task.getId(),
+                        "fDescription", description
+                )
+        );
     }
 
     /**
      * Обновить значение поля done для объекта Task в репозитории по id
      *
-     * @param id Значение поля id объекта Task, для которого нужно обновить поле done
+     * @param id   Значение поля id объекта Task, для которого нужно обновить поле done
      * @param done Новое значение поля done
      * @return true в случае успешного обновления, иначе -- false
      */
     @Override
     public boolean setDoneById(int id, boolean done) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(UPDATE_DONE_BY_ID_QUERY)
-                        .setParameter("fId", id)
-                        .setParameter("fDone", done);
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(
+                UPDATE_DONE_BY_ID_QUERY,
+                Map.of(
+                        "fId", id,
+                        "fDone", done
+                )
+        );
     }
 
     /**
@@ -288,19 +186,12 @@ public class HibernateTaskRepository implements TaskRepository {
      * @return true в случае успешного обновления, иначе -- false
      */
     public boolean setDone(Task task, boolean done) {
-        boolean result = false;
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                Query query = session.createQuery(UPDATE_DONE_BY_ID_QUERY)
-                        .setParameter("fId", task.getId())
-                        .setParameter("fDone", done);
-                result = query.executeUpdate() > 0;
-                session.getTransaction().commit();
-            } catch (HibernateException e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return result;
+        return crudRepository.execute(
+                UPDATE_DONE_BY_ID_QUERY,
+                Map.of(
+                        "fId", task.getId(),
+                        "fDone", done
+                )
+        );
     }
 }

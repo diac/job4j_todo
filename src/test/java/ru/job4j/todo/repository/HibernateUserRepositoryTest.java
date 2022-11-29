@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(classes = {DataSourceConfig.class, HibernateUserRepository.class})
+@SpringBootTest(classes = {DataSourceConfig.class, HibernateCrudRepository.class, HibernateUserRepository.class})
 public class HibernateUserRepositoryTest {
 
     @Autowired
