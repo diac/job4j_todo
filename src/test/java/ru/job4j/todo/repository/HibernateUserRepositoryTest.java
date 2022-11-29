@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.job4j.todo.config.DataSourceConfig;
 import ru.job4j.todo.model.User;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(classes = {DataSourceConfig.class, HibernateUserRepository.class})
@@ -85,5 +87,15 @@ public class HibernateUserRepositoryTest {
         assertThat(userInDb).isEqualTo(user);
         assertThat(userInDb.getName()).isEqualTo(userInDb.getName());
         assertThat(userInDb.getPassword()).isEqualTo(userInDb.getPassword());
+    }
+
+    @Test
+    public void whenAddDuplicateThenEmptyOptional() {
+        String value = String.valueOf(System.currentTimeMillis());
+        User user = new User(0, value, value, value);
+        User duplicateUser = new User(0, value, value, value);
+        repository.add(user);
+        Optional<User> duplicateResult = repository.add(duplicateUser);
+        assertThat(duplicateResult.isEmpty()).isTrue();
     }
 }

@@ -9,6 +9,7 @@ import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
 
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -149,16 +150,18 @@ public class HibernateUserRepository implements UserRepository {
      */
     @Override
     public Optional<User> add(User user) {
+        Optional<User> result = Optional.empty();
         try (Session session = sf.openSession()) {
             try {
                 session.beginTransaction();
                 session.persist(user);
                 session.getTransaction().commit();
-            } catch (HibernateException e) {
+                result = Optional.of(user);
+            } catch (PersistenceException e) {
                 session.getTransaction().rollback();
             }
         }
-        return Optional.of(user);
+        return result;
     }
 
     /**
