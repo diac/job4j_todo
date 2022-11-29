@@ -107,7 +107,7 @@ public class SimpleUserService implements UserService {
      */
     @Override
     public boolean delete(User user) {
-        return delete(user);
+        return repository.delete(user);
     }
 
     /**
@@ -118,6 +118,6 @@ public class SimpleUserService implements UserService {
      */
     @Override
     public boolean deleteById(int id) {
-        return false;
+        return repository.deleteById(id);
     }
 }
