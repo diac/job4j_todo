@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
+import ru.job4j.todo.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class TaskController {
 
     private final TaskService taskService;
+    private final UserService userService;
 
     @GetMapping("")
     public String index(Model model) {
@@ -44,11 +46,12 @@ public class TaskController {
     @GetMapping("/new")
     public String create(Model model) {
         model.addAttribute("task", new Task());
+        model.addAttribute("users", userService.findAll());
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String store(@ModelAttribute Task task) {
+    public String store(@ModelAttribute("task") Task task) {
         taskService.add(task);
         return "redirect:/tasks";
     }
@@ -82,6 +85,7 @@ public class TaskController {
             return "redirect:/tasks";
         }
         model.addAttribute("task", task.get());
+        model.addAttribute("users", userService.findAll());
         return "tasks/edit";
     }
 
