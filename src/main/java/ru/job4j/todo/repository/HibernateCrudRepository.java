@@ -3,9 +3,9 @@ package ru.job4j.todo.repository;
 import lombok.AllArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,11 +67,7 @@ public class HibernateCrudRepository implements CrudRepository {
             for (Map.Entry<String, Object> arg : args.entrySet()) {
                 sq.setParameter(arg.getKey(), arg.getValue());
             }
-            try {
-                result = Optional.ofNullable(sq.getSingleResult());
-            } catch (NoResultException e) {
-                result = Optional.empty();
-            }
+            result = sq.uniqueResultOptional();
             return result;
         };
         return tx(command);
@@ -91,17 +87,18 @@ public class HibernateCrudRepository implements CrudRepository {
     @Override
     public <T> T tx(Function<Session, T> command) {
         var session = sf.openSession();
-        try (session) {
-            var tx = session.beginTransaction();
+        Transaction tx = session.beginTransaction();
+        try {
             T rsl = command.apply(session);
             tx.commit();
             return rsl;
         } catch (Exception e) {
-            var tx = session.getTransaction();
-            if (tx.isActive()) {
-                tx.rollback();
-            }
+           if (tx != null) {
+               tx.rollback();
+           }
             throw e;
+        } finally {
+            session.close();
         }
     }
 
