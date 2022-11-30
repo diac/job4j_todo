@@ -7,9 +7,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.TaskService;
 import ru.job4j.todo.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +54,9 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    public String store(@ModelAttribute("task") Task task) {
+    public String store(@ModelAttribute("task") Task task, HttpServletRequest request) {
+        HttpSession httpSession = request.getSession();
+        task.setUser((User) httpSession.getAttribute("user"));
         taskService.add(task);
         return "redirect:/tasks";
     }
