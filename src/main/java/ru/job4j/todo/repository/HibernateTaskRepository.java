@@ -18,13 +18,15 @@ import java.util.Optional;
 @AllArgsConstructor
 public class HibernateTaskRepository implements TaskRepository {
 
-    private static final String FIND_ALL_QUERY = "SELECT t FROM Task t";
+    private static final String FIND_ALL_QUERY = "SELECT t FROM Task t JOIN FETCH t.priority";
 
-    private static final String FIND_ALL_BY_DONE_QUERY = "SELECT t FROM Task t WHERE done = :fDone";
+    private static final String FIND_ALL_BY_DONE_QUERY
+            = "SELECT t FROM Task t JOIN FETCH t.priority WHERE done = :fDone";
 
-    private static final String FIND_BY_ID_QUERY = "SELECT t FROM Task t WHERE id = :fId";
+    private static final String FIND_BY_ID_QUERY = "SELECT t FROM Task t JOIN FETCH t.priority WHERE t.id = :fId";
 
-    private static final String UPDATE_DESCRIPTION_BY_ID_QUERY = "UPDATE Task SET description = :fDescription WHERE id = :fId";
+    private static final String UPDATE_DESCRIPTION_BY_ID_QUERY
+            = "UPDATE Task SET description = :fDescription WHERE id = :fId";
 
     private static final String UPDATE_DONE_BY_ID_QUERY = "UPDATE Task SET done = :fDone WHERE id = :fId";
 

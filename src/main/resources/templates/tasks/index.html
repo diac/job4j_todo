@@ -26,6 +26,7 @@
             <th>Описание</th>
             <th>Дата создания</th>
             <th>Ответственный</th>
+            <th>Приоритет</th>
             <th>Статус</th>
         </tr>
         </thead>
@@ -40,6 +41,9 @@
             <td th:text="${#temporals.format(task.getCreated(), 'dd-MM-yyyy HH:mm')}"></td>
             <td
                     th:text="${task.getUser().getName()}"
+            ></td>
+            <td
+                    th:text="${task.getPriority().getName()}"
             ></td>
             <td>
                 <span th:if="${task.isDone()}">Выполнено</span>

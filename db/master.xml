@@ -8,4 +8,8 @@
     <include file="scripts/001_ddl_create_tasks_table.sql" relativeToChangelogFile="true"/>
     <include file="scripts/002_ddl_create_todo_user_table.sql" relativeToChangelogFile="true"/>
     <include file="scripts/003_ddl_alter_table_tasks_add_user_id.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/004_ddl_create_table_priorities.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/005_dml_priorities_initial_data.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/006_ddl_alter_table_tasks_add_column_priority_id.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/007_dml_update_tasks_set_priority_id_default_values.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

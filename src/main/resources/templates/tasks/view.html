@@ -4,7 +4,10 @@
 <body>
 <div class="container">
     <nav th:replace="fragments/navbar :: navbarMain"></nav>
-    <article th:text="${task.getDescription()}" class="mb-4"></article>
+    <article class="mb-4">
+        <p th:text="${task.getDescription()}"></p>
+        <p>Приоритет: <span th:text="${task.getPriority().getName()}"></span></p>
+    </article>
     <div class="btn-group" th:with="id = ${task.getId()}">
         <form
                 th:method="patch"
