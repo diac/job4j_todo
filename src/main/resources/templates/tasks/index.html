@@ -26,6 +26,7 @@
             <th>Описание</th>
             <th>Дата создания</th>
             <th>Ответственный</th>
+            <th>Категории</th>
             <th>Приоритет</th>
             <th>Статус</th>
         </tr>
@@ -42,6 +43,14 @@
             <td
                     th:text="${task.getUser().getName()}"
             ></td>
+            <td
+            >
+                <span
+                    th:each="category: ${task.getCategories}"
+                    th:text="${category.getName()}"
+                    class="badge bg-primary mx-1"
+                ></span>
+            </td>
             <td
                     th:text="${task.getPriority().getName()}"
             ></td>

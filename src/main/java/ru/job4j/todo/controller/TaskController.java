@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.TaskService;
 import ru.job4j.todo.service.UserService;
 
@@ -24,6 +25,7 @@ public class TaskController {
 
     private final TaskService taskService;
     private final UserService userService;
+    private final CategoryService categoryService;
 
     @GetMapping("")
     public String index(Model model) {
@@ -50,11 +52,15 @@ public class TaskController {
     public String create(Model model) {
         model.addAttribute("task", new Task());
         model.addAttribute("users", userService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String store(@ModelAttribute("task") Task task, HttpServletRequest request) {
+    public String store(
+            @ModelAttribute("task") Task task,
+            HttpServletRequest request
+    ) {
         HttpSession httpSession = request.getSession();
         task.setUser((User) httpSession.getAttribute("user"));
         taskService.add(task);
@@ -73,7 +79,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/complete")
-    public String complete(@PathVariable("id") int id,  RedirectAttributes redirectAttributes) {
+    public String complete(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         if (taskService.completeById(id)) {
             redirectAttributes.addFlashAttribute("successMessage", "Задача отмечена как завершенная");
         } else {
@@ -83,7 +89,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable("id") int id,  Model model, RedirectAttributes redirectAttributes) {
+    public String edit(@PathVariable("id") int id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Task> task = taskService.findById(id);
         if (task.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
