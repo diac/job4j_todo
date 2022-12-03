@@ -1,6 +1,5 @@
 package ru.job4j.todo.repository;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +14,6 @@ import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 @SpringBootTest(classes = {
         DataSourceConfig.class,
         HibernateCrudRepository.class,
