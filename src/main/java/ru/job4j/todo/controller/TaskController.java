@@ -12,10 +12,10 @@ import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
-import ru.job4j.todo.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,13 +26,15 @@ import java.util.Optional;
 public class TaskController {
 
     private final TaskService taskService;
-    private final UserService userService;
     private final PriorityService priorityService;
     private final CategoryService categoryService;
 
     @GetMapping("")
-    public String index(Model model) {
-        List<Task> tasks = taskService.findAll();
+    public String index(Model model, HttpServletRequest request) {
+        HttpSession httpSession = request.getSession();
+        User user = (User) httpSession.getAttribute("user");
+        ZoneId zoneId = ZoneId.of(user.getUserZone());
+        List<Task> tasks = taskService.findAll(zoneId);
         model.addAttribute("tasks", tasks);
         return "tasks/index";
     }

@@ -10,6 +10,7 @@ import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -34,6 +35,25 @@ public class SimpleTaskService implements TaskService {
     @Override
     public List<Task> findAll() {
         return repository.findAll();
+    }
+
+    /**
+     * Получить все объекты для модели Task из репозитория с учетом часового пояса
+     *
+     * @return Список задач. Пустой список, если ничего не найдено
+     */
+    @Override
+    public List<Task> findAll(ZoneId zoneId) {
+        List<Task> tasks = findAll();
+        tasks.forEach(task ->
+                task.setCreated(
+                        task.getCreated()
+                                .atZone(TimeZone.getDefault().toZoneId())
+                                .withZoneSameInstant(zoneId)
+                                .toLocalDateTime()
+                )
+        );
+        return tasks;
     }
 
     /**
@@ -97,7 +117,7 @@ public class SimpleTaskService implements TaskService {
     /**
      * Обновить в репозитории объект Task данными из объекта по передаваемому значению id
      *
-     * @param id Значение поля id для обновляемого объекта Task
+     * @param id          Значение поля id для обновляемого объекта Task
      * @param taskFormDto Объект TaskFormDto, из которого берутся данные для обновления
      * @return true в случае успешного обновления. Иначе -- false
      */

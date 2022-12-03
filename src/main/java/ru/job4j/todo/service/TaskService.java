@@ -3,12 +3,15 @@ package ru.job4j.todo.service;
 import ru.job4j.todo.dto.TaskFormDto;
 import ru.job4j.todo.model.Task;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
 public interface TaskService {
 
     List<Task> findAll();
+
+    List<Task> findAll(ZoneId zoneId);
 
     List<Task> findAllByDone(boolean done);
 

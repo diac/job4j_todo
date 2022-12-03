@@ -20,6 +20,16 @@
             <label for="password">Пароль</label>
             <input id="password" class="form-control" name="password" type="password" required>
         </div>
+        <div class="form-group">
+            <label for="timeZone">Часовой пояс</label>
+            <select id="timeZone" class="form-control form-select" name="userZone" required>
+                <option
+                        th:each="timeZone : ${timeZones}"
+                        th:value="${timeZone.getID()}"
+                        th:text="${timeZone.getDisplayName()}"
+                ></option>
+            </select>
+        </div>
         <button type="submit" class="btn btn-success">Подтвердить регистрацию</button>
     </form>
 </div>
