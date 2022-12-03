@@ -3,15 +3,14 @@ package ru.job4j.todo.service;
 import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Service;
-import ru.job4j.todo.dto.TaskFormDto;
-import ru.job4j.todo.model.Category;
-import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.repository.TaskRepository;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.TimeZone;
 
 /**
  * Сервис, осуществляющий доступ к данным объектов модели Task в репозитории
@@ -93,17 +92,6 @@ public class SimpleTaskService implements TaskService {
     }
 
     /**
-     * Добавить новый объект в репозиторий из объекта TaskFormDto
-     *
-     * @param taskFormDto Объект TaskFormDto, из которого будет создан и добавлен в репозиторий новый объект Task
-     * @return Optional для объекта Task, если удалось добавить этот объект в репозиторий. Иначе -- Optional.empty()
-     */
-    @Override
-    public Optional<Task> add(TaskFormDto taskFormDto) {
-        return add(fromDto(taskFormDto));
-    }
-
-    /**
      * Обновить в репозитории объект, соответствующий передаваемому объекту Task
      *
      * @param task Объект Task, который нужно обновить в репозитории
@@ -112,27 +100,6 @@ public class SimpleTaskService implements TaskService {
     @Override
     public boolean update(Task task) {
         return repository.update(task);
-    }
-
-    /**
-     * Обновить в репозитории объект Task данными из объекта по передаваемому значению id
-     *
-     * @param id          Значение поля id для обновляемого объекта Task
-     * @param taskFormDto Объект TaskFormDto, из которого берутся данные для обновления
-     * @return true в случае успешного обновления. Иначе -- false
-     */
-    @Override
-    public boolean update(int id, TaskFormDto taskFormDto) {
-        Optional<Task> taskOptional = findById(id);
-        if (taskOptional.isEmpty()) {
-            return false;
-        }
-        Task taskInDb = taskOptional.get();
-        Task newTask = fromDto(taskFormDto);
-        taskInDb.setDescription(newTask.getDescription());
-        taskInDb.setPriority(newTask.getPriority());
-        taskInDb.setCategories(newTask.getCategories());
-        return repository.update(taskInDb);
     }
 
     /**
@@ -189,51 +156,5 @@ public class SimpleTaskService implements TaskService {
     @Override
     public boolean completeById(int id) {
         return repository.setDoneById(id, true);
-    }
-
-    /**
-     * Создать новый объект Task из передаваемого объекта TaskFormDto
-     *
-     * @param taskFormDto Объект TaskFormDto, из которого создается объект Task
-     * @return Созданный объект Task
-     */
-    @Override
-    public Task fromDto(TaskFormDto taskFormDto) {
-        Task task = new Task();
-        task.setId(taskFormDto.getId());
-        task.setDescription(taskFormDto.getDescription());
-        Optional<Priority> priority = priorityService.findById(taskFormDto.getPriorityId());
-        task.setPriority(priority.orElse(null));
-        Set<Category> categories = Arrays.stream(taskFormDto.getCategoryIds())
-                .collect(
-                        HashSet::new,
-                        (categoriesResult, categoryId) -> {
-                            Optional<Category> category = categoryService.findById(categoryId);
-                            category.ifPresent(categoriesResult::add);
-                        },
-                        AbstractCollection::addAll
-                );
-        task.setCategories(categories);
-        return task;
-    }
-
-    /**
-     * Создать новый объект TaskFormDto из передаваемого объекта Task
-     *
-     * @param task Объект Task, из которого создается объект TaskFormDto
-     * @return Созданный объект TaskFormDto
-     */
-    @Override
-    public TaskFormDto toDto(Task task) {
-        TaskFormDto taskFormDto = new TaskFormDto();
-        taskFormDto.setId(task.getId());
-        taskFormDto.setDescription(task.getDescription());
-        Optional<Priority> priority = Optional.ofNullable(task.getPriority());
-        priority.ifPresent(value -> taskFormDto.setPriorityId(value.getId()));
-        taskFormDto.setCategoryIds(task.getCategories().stream()
-                .mapToInt(Category::getId)
-                .toArray()
-        );
-        return taskFormDto;
     }
 }

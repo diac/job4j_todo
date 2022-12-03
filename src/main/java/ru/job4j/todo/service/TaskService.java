@@ -1,6 +1,5 @@
 package ru.job4j.todo.service;
 
-import ru.job4j.todo.dto.TaskFormDto;
 import ru.job4j.todo.model.Task;
 
 import java.time.ZoneId;
@@ -19,11 +18,7 @@ public interface TaskService {
 
     Optional<Task> add(Task task);
 
-    Optional<Task> add(TaskFormDto taskFormDto);
-
     boolean update(Task task);
-
-    boolean update(int id, TaskFormDto taskFormDto);
 
     boolean delete(Task task);
 
@@ -34,8 +29,4 @@ public interface TaskService {
     boolean complete(Task task);
 
     boolean completeById(int id);
-
-    Task fromDto(TaskFormDto taskFormDto);
-
-    TaskFormDto toDto(Task task);
 }

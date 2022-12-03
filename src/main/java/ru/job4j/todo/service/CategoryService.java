@@ -4,6 +4,7 @@ import ru.job4j.todo.model.Category;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CategoryService {
 
@@ -18,4 +19,6 @@ public interface CategoryService {
     boolean delete(Category category);
 
     boolean deleteById(int id);
+
+    Set<Category> findAllByIds(int[] ids);
 }

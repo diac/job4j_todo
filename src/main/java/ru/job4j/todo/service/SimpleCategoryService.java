@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.job4j.todo.model.Category;
 import ru.job4j.todo.repository.CategoryRepository;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Сервис, осуществляющий доступ к данным объектов модели Category в репозитории
@@ -81,5 +80,21 @@ public class SimpleCategoryService implements CategoryService {
     @Override
     public boolean deleteById(int id) {
         return repository.deleteById(id);
+    }
+
+    /**
+     * Найти все категории по передаваемому массиву идентификаторов
+     *
+     * @param ids Массив идентификаторов объектов Category
+     * @return Найденный набор категорий
+     */
+    @Override
+    public Set<Category> findAllByIds(int[] ids) {
+        Set<Category> categories = new HashSet<>();
+        Arrays.stream(ids).forEach(id -> {
+            Optional<Category> category = findById(id);
+            category.ifPresent(categories::add);
+        });
+        return categories;
     }
 }

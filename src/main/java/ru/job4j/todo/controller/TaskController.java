@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.job4j.todo.dto.TaskFormDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
@@ -55,7 +54,7 @@ public class TaskController {
 
     @GetMapping("/new")
     public String create(Model model) {
-        model.addAttribute("taskFormDto", new TaskFormDto());
+        model.addAttribute("task", new Task());
         model.addAttribute("priorities", priorityService.findAll());
         model.addAttribute("categories", categoryService.findAll());
         return "tasks/create";
@@ -63,12 +62,15 @@ public class TaskController {
 
     @PostMapping("/create")
     public String store(
-            @ModelAttribute("taskFormDto") TaskFormDto taskFormDto,
+            @ModelAttribute("task") Task task,
+            @RequestParam("priorityId") int priorityId,
+            @RequestParam("categoryIds") int[] categoryIds,
             HttpServletRequest request
     ) {
         HttpSession httpSession = request.getSession();
-        Task task = taskService.fromDto(taskFormDto);
         task.setUser((User) httpSession.getAttribute("user"));
+        task.setPriority(priorityService.findById(priorityId).orElse(null));
+        task.setCategories(categoryService.findAllByIds(categoryIds));
         taskService.add(task);
         return "redirect:/tasks";
     }
@@ -101,7 +103,7 @@ public class TaskController {
             redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
             return "redirect:/tasks";
         }
-        model.addAttribute("taskFormDto", taskService.toDto(task.get()));
+        model.addAttribute("task", task.get());
         model.addAttribute("priorities", priorityService.findAll());
         model.addAttribute("categories", categoryService.findAll());
         return "tasks/edit";
@@ -109,11 +111,17 @@ public class TaskController {
 
     @PatchMapping("/{id}")
     public String patch(
-            @ModelAttribute("taskFormDto") TaskFormDto taskFormDto,
+            @ModelAttribute("task") Task task,
             @PathVariable("id") int id,
+            @RequestParam("priorityId") int priorityId,
+            @RequestParam("categoryIds") int[] categoryIds,
             RedirectAttributes redirectAttributes
     ) {
-        if (taskService.update(id, taskFormDto)) {
+        Task taskInDb = taskService.findById(id).orElse(new Task());
+        taskInDb.setDescription(task.getDescription());
+        taskInDb.setPriority(priorityService.findById(priorityId).orElse(null));
+        taskInDb.setCategories(categoryService.findAllByIds(categoryIds));
+        if (taskService.update(taskInDb)) {
             redirectAttributes.addFlashAttribute("successMessage", "Задача обновлена");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить задачу");
