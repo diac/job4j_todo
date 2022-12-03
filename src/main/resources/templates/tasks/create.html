@@ -7,15 +7,25 @@
     <form
             method="post"
             th:action="@{/tasks/create}"
-            th:object="${task}"
+            th:object="${taskFormDto}"
     >
         <div class="form-group">
             <label for="description">Описание</label>
             <input id="description" class="form-control" th:field="*{description}" required>
         </div>
         <div class="form-group">
+            <label for="priority">Приоритет</label>
+            <select id="priority" class="form-control form-select" th:field="*{priorityId}" required>
+                <option
+                        th:each="priority: ${priorities}"
+                        th:value="${priority.id}"
+                        th:text="${priority.name}"
+                ></option>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="categories">Категории</label>
-            <select id="categories" class="form-control form-select" th:field="*{categories}" multiple required>
+            <select id="categories" class="form-control form-select" th:field="*{categoryIds}" multiple required>
                 <option
                         th:each="category : ${categories}"
                         th:value="${category.id}"

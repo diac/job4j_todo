@@ -6,9 +6,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.job4j.todo.dto.TaskFormDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
+import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 import ru.job4j.todo.service.UserService;
 
@@ -25,6 +27,7 @@ public class TaskController {
 
     private final TaskService taskService;
     private final UserService userService;
+    private final PriorityService priorityService;
     private final CategoryService categoryService;
 
     @GetMapping("")
@@ -50,18 +53,19 @@ public class TaskController {
 
     @GetMapping("/new")
     public String create(Model model) {
-        model.addAttribute("task", new Task());
-        model.addAttribute("users", userService.findAll());
+        model.addAttribute("taskFormDto", new TaskFormDto());
+        model.addAttribute("priorities", priorityService.findAll());
         model.addAttribute("categories", categoryService.findAll());
         return "tasks/create";
     }
 
     @PostMapping("/create")
     public String store(
-            @ModelAttribute("task") Task task,
+            @ModelAttribute("taskFormDto") TaskFormDto taskFormDto,
             HttpServletRequest request
     ) {
         HttpSession httpSession = request.getSession();
+        Task task = taskService.fromDto(taskFormDto);
         task.setUser((User) httpSession.getAttribute("user"));
         taskService.add(task);
         return "redirect:/tasks";
@@ -95,18 +99,19 @@ public class TaskController {
             redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
             return "redirect:/tasks";
         }
-        model.addAttribute("task", task.get());
-        model.addAttribute("users", userService.findAll());
+        model.addAttribute("taskFormDto", taskService.toDto(task.get()));
+        model.addAttribute("priorities", priorityService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
         return "tasks/edit";
     }
 
     @PatchMapping("/{id}")
     public String patch(
-            @ModelAttribute("task") Task task,
+            @ModelAttribute("taskFormDto") TaskFormDto taskFormDto,
             @PathVariable("id") int id,
             RedirectAttributes redirectAttributes
     ) {
-        if (taskService.updateDescriptionById(id, task.getDescription())) {
+        if (taskService.update(id, taskFormDto)) {
             redirectAttributes.addFlashAttribute("successMessage", "Задача обновлена");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить задачу");

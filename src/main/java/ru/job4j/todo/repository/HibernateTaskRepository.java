@@ -19,13 +19,13 @@ import java.util.Optional;
 public class HibernateTaskRepository implements TaskRepository {
 
     private static final String FIND_ALL_QUERY
-            = "SELECT DISTINCT t FROM Task t JOIN FETCH t.priority JOIN FETCH t.categories";
+            = "SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.priority LEFT JOIN FETCH t.categories";
 
     private static final String FIND_ALL_BY_DONE_QUERY
-            = "SELECT DISTINCT t FROM Task t JOIN FETCH t.priority JOIN FETCH t.categories WHERE done = :fDone";
+            = "SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.priority LEFT JOIN FETCH t.categories WHERE done = :fDone";
 
     private static final String FIND_BY_ID_QUERY
-            = "SELECT DISTINCT t FROM Task t JOIN FETCH t.priority JOIN FETCH t.categories WHERE t.id = :fId";
+            = "SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.priority LEFT JOIN FETCH t.categories WHERE t.id = :fId";
 
     private static final String UPDATE_DESCRIPTION_BY_ID_QUERY
             = "UPDATE Task SET description = :fDescription WHERE id = :fId";

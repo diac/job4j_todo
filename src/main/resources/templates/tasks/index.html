@@ -51,9 +51,12 @@
                     class="badge bg-primary mx-1"
                 ></span>
             </td>
-            <td
-                    th:text="${task.getPriority().getName()}"
-            ></td>
+            <td>
+                <span
+                        th:if="${task.getPriority() != null}"
+                        th:text="${task.getPriority().getName()}"
+                ></span>
+            </td>
             <td>
                 <span th:if="${task.isDone()}">Выполнено</span>
                 <span th:if="${!task.isDone()}">Не выполнено</span>
