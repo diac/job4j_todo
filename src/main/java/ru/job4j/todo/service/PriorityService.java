@@ -1,0 +1,21 @@
+package ru.job4j.todo.service;
+
+import ru.job4j.todo.model.Priority;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface PriorityService {
+
+    List<Priority> findAll();
+
+    Optional<Priority> findById(int id);
+
+    Optional<Priority> add(Priority priority);
+
+    boolean update(Priority priority);
+
+    boolean delete(Priority priority);
+
+    boolean deleteById(int id);
+}
