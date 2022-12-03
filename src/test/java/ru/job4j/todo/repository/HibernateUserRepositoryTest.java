@@ -1,6 +1,5 @@
 package ru.job4j.todo.repository;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,9 +9,8 @@ import ru.job4j.todo.model.User;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 @SpringBootTest(classes = {DataSourceConfig.class, HibernateCrudRepository.class, HibernateUserRepository.class})
 public class HibernateUserRepositoryTest {
 
@@ -48,7 +46,7 @@ public class HibernateUserRepositoryTest {
     }
 
     @Test
-    public void whenDelete()  {
+    public void whenDelete() {
         String value = String.valueOf(System.currentTimeMillis());
         User user = new User(0, value, value, value, TimeZone.getDefault().toZoneId().toString());
         repository.add(user);
