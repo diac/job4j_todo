@@ -6,10 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -102,7 +99,9 @@ public class HibernateCrudRepository implements CrudRepository {
 
     @Override
     public <T> T tx(Function<Session, T> command) {
-        var session = sf.openSession();
+        var session = sf
+                .withOptions()
+                .openSession();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
