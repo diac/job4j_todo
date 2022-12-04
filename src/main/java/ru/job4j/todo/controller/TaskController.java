@@ -131,7 +131,7 @@ public class TaskController {
             RedirectAttributes redirectAttributes
     ) {
         try {
-            if (taskService.update(task, id, priorityId, categoryIds)) {
+            if (taskService.update(id, task.getDescription(), priorityId, categoryIds)) {
                 redirectAttributes.addFlashAttribute("successMessage", "Задача обновлена");
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить задачу");

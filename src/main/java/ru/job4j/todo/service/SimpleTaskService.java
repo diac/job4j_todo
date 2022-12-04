@@ -73,7 +73,7 @@ public class SimpleTaskService implements TaskService {
      * Получить все объекты для модели Task из репозитория, отфильтрованные по передаваемому значению
      * с учетом часового пояса
      *
-     * @param done Значение поля done для объектов Task (true -- для выполненных, false -- для невыполненных)
+     * @param done   Значение поля done для объектов Task (true -- для выполненных, false -- для невыполненных)
      * @param zoneId Идентификатор часового пояса
      * @return Список задач. Пустой список, если ничего не найдено
      */
@@ -170,10 +170,10 @@ public class SimpleTaskService implements TaskService {
     }
 
     /**
-     * Обновить в репозитории объект, соответствующий передаваемому объекту Task
+     * Обновить в репозитории объект, соответствующий передаваемому значению идентификатора объекта Task
      *
      * @param id          Идентификатор задачи в репозитории
-     * @param task        Объект Task, который нужно обновить в репозитории
+     * @param description Новое описание задачи
      * @param priorityId  Идентификатор приоритета задачи
      * @param categoryIds Массив идентификаторов категорий задачи
      * @return true в случае успешного обновления. Иначе -- false
@@ -181,19 +181,12 @@ public class SimpleTaskService implements TaskService {
      *                                  указан priorityId для несуществующего приоритета
      */
     @Override
-    public boolean update(Task task, int id, int priorityId, int[] categoryIds) {
-        Optional<Task> taskInDb = findById(id);
-        if (taskInDb.isEmpty()) {
-            throw new IllegalArgumentException(String.format("Задача %d не существует", id));
-        }
+    public boolean update(int id, String description, int priorityId, int[] categoryIds) {
         Optional<Priority> priority = priorityService.findById(priorityId);
         if (priority.isEmpty()) {
             throw new IllegalArgumentException(String.format("Приоритет #%d не существует", priorityId));
         }
-        taskInDb.get().setDescription(task.getDescription());
-        taskInDb.get().setPriority(priorityService.findById(priorityId).orElse(null));
-        taskInDb.get().setCategories(categoryService.findAllByIds(categoryIds));
-        return update(taskInDb.get());
+        return repository.update(id, description, priority.get(), categoryService.findAllByIds(categoryIds));
     }
 
     /**

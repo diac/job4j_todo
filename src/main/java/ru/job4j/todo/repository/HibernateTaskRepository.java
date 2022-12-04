@@ -3,11 +3,14 @@ package ru.job4j.todo.repository;
 import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Repository;
+import ru.job4j.todo.model.Category;
+import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -104,6 +107,35 @@ public class HibernateTaskRepository implements TaskRepository {
             session.merge(task);
             return true;
         });
+    }
+
+    /**
+     * Обновить в БД запись, соответсвующую передаваемому значению идентификатора объекта Task
+     *
+     * @param id Идентификатор объекта Task в БД
+     * @param description Новое описание задачи
+     * @param priority Новый приоритет задачи
+     * @param categories Новый набор категорий задачи
+     * @return true в случае успешного обновления. Иначе -- false
+     */
+    @Override
+    public boolean update(
+            int id,
+            String description,
+            Priority priority,
+            Set<Category> categories
+    ) {
+        boolean result;
+        Optional<Task> task = findById(id);
+        if (task.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Задача %d не существует", id));
+        } else {
+            task.get().setDescription(description);
+            task.get().setPriority(priority);
+            task.get().setCategories(categories);
+            result = update(task.get());
+        }
+        return result;
     }
 
     /**

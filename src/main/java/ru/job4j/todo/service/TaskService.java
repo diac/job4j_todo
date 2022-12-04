@@ -27,7 +27,7 @@ public interface TaskService {
 
     boolean update(Task task);
 
-    boolean update(Task task, int id, int priorityId, int[] categoryIds);
+    boolean update(int id, String description, int priorityId, int[] categoryIds);
 
     boolean delete(Task task);
 
