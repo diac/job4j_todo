@@ -65,13 +65,19 @@ public class TaskController {
             @ModelAttribute("task") Task task,
             @RequestParam("priorityId") int priorityId,
             @RequestParam("categoryIds") int[] categoryIds,
-            HttpServletRequest request
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes
     ) {
         HttpSession httpSession = request.getSession();
-        task.setUser((User) httpSession.getAttribute("user"));
-        task.setPriority(priorityService.findById(priorityId).orElse(null));
-        task.setCategories(categoryService.findAllByIds(categoryIds));
-        taskService.add(task);
+        try {
+            taskService.add(task, priorityId, categoryIds, (User) httpSession.getAttribute("user"));
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    String.format("Не удалось создать новую задачу. Причина: %s", e.getMessage())
+            );
+            return "redirect:/tasks/new";
+        }
         return "redirect:/tasks";
     }
 
@@ -117,14 +123,18 @@ public class TaskController {
             @RequestParam("categoryIds") int[] categoryIds,
             RedirectAttributes redirectAttributes
     ) {
-        Task taskInDb = taskService.findById(id).orElse(new Task());
-        taskInDb.setDescription(task.getDescription());
-        taskInDb.setPriority(priorityService.findById(priorityId).orElse(null));
-        taskInDb.setCategories(categoryService.findAllByIds(categoryIds));
-        if (taskService.update(taskInDb)) {
-            redirectAttributes.addFlashAttribute("successMessage", "Задача обновлена");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить задачу");
+        try {
+            if (taskService.update(task, id, priorityId, categoryIds)) {
+                redirectAttributes.addFlashAttribute("successMessage", "Задача обновлена");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Не удалось обновить задачу");
+            }
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    String.format("Не удалось обновить задачу. Причина: %s", e.getMessage())
+            );
+            return String.format("redirect:/tasks/%d/edit", id);
         }
         return "redirect:/tasks";
     }

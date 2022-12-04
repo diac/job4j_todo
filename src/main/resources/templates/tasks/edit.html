@@ -3,6 +3,11 @@
 <head th:replace="fragments/head :: htmlHead"></head>
 <body>
 <div class="container">
+    <div
+            th:if="${errorMessage != null}"
+            th:text="${errorMessage}"
+            class="alert alert-danger"
+    ></div>
     <h1>Редактирование задачи</h1>
     <form
             th:object="${task}"

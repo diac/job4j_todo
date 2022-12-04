@@ -1,6 +1,7 @@
 package ru.job4j.todo.service;
 
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 
 import java.time.ZoneId;
 import java.util.List;
@@ -18,7 +19,11 @@ public interface TaskService {
 
     Optional<Task> add(Task task);
 
+    Optional<Task> add(Task task, int priorityId, int[] categoryIds, User user);
+
     boolean update(Task task);
+
+    boolean update(Task task, int id, int priorityId, int[] categoryIds);
 
     boolean delete(Task task);
 
