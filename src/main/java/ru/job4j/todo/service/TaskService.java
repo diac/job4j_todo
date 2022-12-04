@@ -15,7 +15,11 @@ public interface TaskService {
 
     List<Task> findAllByDone(boolean done);
 
+    List<Task> findAllByDone(boolean done, ZoneId zoneId);
+
     Optional<Task> findById(int id);
+
+    Optional<Task> findById(int id, ZoneId zoneId);
 
     Optional<Task> add(Task task);
 

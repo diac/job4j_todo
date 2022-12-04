@@ -7,6 +7,7 @@
     <article class="mb-4">
         <p th:text="${task.getDescription()}"></p>
         <p th:if="${task.getPriority() != null}">Приоритет: <span th:text="${task.getPriority().getName()}"></span></p>
+        <p>Дата создания: <span th:text="${dateFormat.apply(task.getCreated())}"a></span></p>
     </article>
     <div class="btn-group" th:with="id = ${task.getId()}">
         <form

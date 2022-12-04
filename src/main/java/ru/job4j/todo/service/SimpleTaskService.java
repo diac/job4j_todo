@@ -41,6 +41,7 @@ public class SimpleTaskService implements TaskService {
     /**
      * Получить все объекты для модели Task из репозитория с учетом часового пояса
      *
+     * @param zoneId Идентификатор часового пояса
      * @return Список задач. Пустой список, если ничего не найдено
      */
     @Override
@@ -69,6 +70,28 @@ public class SimpleTaskService implements TaskService {
     }
 
     /**
+     * Получить все объекты для модели Task из репозитория, отфильтрованные по передаваемому значению
+     * с учетом часового пояса
+     *
+     * @param done Значение поля done для объектов Task (true -- для выполненных, false -- для невыполненных)
+     * @param zoneId Идентификатор часового пояса
+     * @return Список задач. Пустой список, если ничего не найдено
+     */
+    @Override
+    public List<Task> findAllByDone(boolean done, ZoneId zoneId) {
+        List<Task> tasks = findAllByDone(done);
+        tasks.forEach(task ->
+                task.setCreated(
+                        task.getCreated()
+                                .atZone(TimeZone.getDefault().toZoneId())
+                                .withZoneSameInstant(zoneId)
+                                .toLocalDateTime()
+                )
+        );
+        return tasks;
+    }
+
+    /**
      * Получить один объект Task из репозитория по id
      *
      * @param id Уникальный идентификатор объекта Task
@@ -78,6 +101,26 @@ public class SimpleTaskService implements TaskService {
     @Override
     public Optional<Task> findById(int id) {
         return repository.findById(id);
+    }
+
+    /**
+     * Получить один объект Task из репозитория по id с учетом часового пояса
+     *
+     * @param id     Уникальный идентификатор объекта Task
+     * @param zoneId Идентификатор часового пояса
+     * @return Optional для объекта Task, если в репозитории существует объект для переданного id.
+     * Иначе -- Optional.empty()
+     */
+    @Override
+    public Optional<Task> findById(int id, ZoneId zoneId) {
+        Optional<Task> task = findById(id);
+        task.ifPresent(value -> value.setCreated(
+                value.getCreated()
+                        .atZone(TimeZone.getDefault().toZoneId())
+                        .withZoneSameInstant(zoneId)
+                        .toLocalDateTime()
+        ));
+        return task;
     }
 
     /**
@@ -96,10 +139,10 @@ public class SimpleTaskService implements TaskService {
     /**
      * Добавить новый объект в репозиторий из объекта Task
      *
-     * @param task Объект Task, который нужно добавить в репозиторий
-     * @param priorityId Идентификатор приоритета задачи
+     * @param task        Объект Task, который нужно добавить в репозиторий
+     * @param priorityId  Идентификатор приоритета задачи
      * @param categoryIds Массив идентификаторов категорий задачи
-     * @param user Пользователь, которому принадлежит задача
+     * @param user        Пользователь, которому принадлежит задача
      * @return Optional для объекта Task, если удалось добавить этот объект в репозиторий. Иначе -- Optional.empty()
      * @throws IllegalArgumentException В случае, если указан priorityId для несуществующего приоритета
      */
@@ -129,13 +172,13 @@ public class SimpleTaskService implements TaskService {
     /**
      * Обновить в репозитории объект, соответствующий передаваемому объекту Task
      *
-     * @param id Идентификатор задачи в репозитории
-     * @param task Объект Task, который нужно обновить в репозитории
-     * @param priorityId Идентификатор приоритета задачи
+     * @param id          Идентификатор задачи в репозитории
+     * @param task        Объект Task, который нужно обновить в репозитории
+     * @param priorityId  Идентификатор приоритета задачи
      * @param categoryIds Массив идентификаторов категорий задачи
-     * @return  true в случае успешного обновления. Иначе -- false
+     * @return true в случае успешного обновления. Иначе -- false
      * @throws IllegalArgumentException В случае, если задача не существует для переданного id, или если
-     * указан priorityId для несуществующего приоритета
+     *                                  указан priorityId для несуществующего приоритета
      */
     @Override
     public boolean update(Task task, int id, int priorityId, int[] categoryIds) {

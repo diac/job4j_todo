@@ -11,6 +11,7 @@ import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
+import ru.job4j.todo.util.DateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -30,25 +31,25 @@ public class TaskController {
 
     @GetMapping("")
     public String index(Model model, HttpServletRequest request) {
-        HttpSession httpSession = request.getSession();
-        User user = (User) httpSession.getAttribute("user");
-        ZoneId zoneId = ZoneId.of(user.getUserZone());
-        List<Task> tasks = taskService.findAll(zoneId);
+        List<Task> tasks = taskService.findAll(getCurrentUserZoneId(request));
         model.addAttribute("tasks", tasks);
+        model.addAttribute("dateFormat", DateFormat.defaultFormatter());
         return "tasks/index";
     }
 
     @GetMapping("/completed")
-    public String completedIndex(Model model) {
-        List<Task> tasks = taskService.findAllByDone(true);
+    public String completedIndex(Model model, HttpServletRequest request) {
+        List<Task> tasks = taskService.findAllByDone(true, getCurrentUserZoneId(request));
         model.addAttribute("tasks", tasks);
+        model.addAttribute("dateFormat", DateFormat.defaultFormatter());
         return "tasks/index";
     }
 
     @GetMapping("/incomplete")
-    public String incompleteIndex(Model model) {
-        List<Task> tasks = taskService.findAllByDone(false);
+    public String incompleteIndex(Model model, HttpServletRequest request) {
+        List<Task> tasks = taskService.findAllByDone(false, getCurrentUserZoneId(request));
         model.addAttribute("tasks", tasks);
+        model.addAttribute("dateFormat", DateFormat.defaultFormatter());
         return "tasks/index";
     }
 
@@ -82,13 +83,19 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public String view(@PathVariable("id") int id, Model model, RedirectAttributes redirectAttributes) {
-        Optional<Task> task = taskService.findById(id);
+    public String view(
+            @PathVariable("id") int id,
+            Model model,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes
+    ) {
+        Optional<Task> task = taskService.findById(id, getCurrentUserZoneId(request));
         if (task.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Задача не найдена");
             return "redirect:/tasks";
         }
         model.addAttribute("task", task.get());
+        model.addAttribute("dateFormat", DateFormat.defaultFormatter());
         return "tasks/view";
     }
 
@@ -147,5 +154,11 @@ public class TaskController {
             redirectAttributes.addFlashAttribute("errorMessage", "Не удалось удалить задачу");
         }
         return "redirect:/tasks";
+    }
+
+    private ZoneId getCurrentUserZoneId(HttpServletRequest request) {
+        HttpSession httpSession = request.getSession();
+        User user = (User) httpSession.getAttribute("user");
+        return ZoneId.of(user.getUserZone());
     }
 }
