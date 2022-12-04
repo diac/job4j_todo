@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Category;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Репозиторий, отвечающий за сериализацию/десериализацию объектов модели Category в БД
@@ -20,6 +19,8 @@ public class HibernateCategoryRepository implements CategoryRepository {
     private static final String FIND_BY_ID_QUERY = "SELECT c FROM Category c WhERE c.id = :fId";
 
     private static final String DELETE_QUERY = "DELETE FROM Category WHERE id = :fId";
+
+    private static final String FIND_ALL_BY_IDS_QUERY = "SELECT c FROM Category c WHERE id IN (:fIds)";
 
     private final CrudRepository crudRepository;
 
@@ -98,5 +99,23 @@ public class HibernateCategoryRepository implements CategoryRepository {
     @Override
     public boolean deleteById(int id) {
         return crudRepository.execute(DELETE_QUERY, Map.of("fId", id));
+    }
+
+    /**
+     * Найти все категории по передаваемому массиву идентификаторов
+     *
+     * @param ids Массив идентификаторов объектов Category
+     * @return Найденный набор категорий
+     */
+    @Override
+    public Set<Category> findAllByIds(int[] ids) {
+        return new HashSet<>(
+                crudRepository.query(
+                        FIND_ALL_BY_IDS_QUERY,
+                        Category.class,
+                        Map.of("fIds", Arrays.stream(ids).boxed().toList()),
+                        Map.of()
+                )
+        );
     }
 }

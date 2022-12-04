@@ -90,11 +90,6 @@ public class SimpleCategoryService implements CategoryService {
      */
     @Override
     public Set<Category> findAllByIds(int[] ids) {
-        Set<Category> categories = new HashSet<>();
-        Arrays.stream(ids).forEach(id -> {
-            Optional<Category> category = findById(id);
-            category.ifPresent(categories::add);
-        });
-        return categories;
+        return repository.findAllByIds(ids);
     }
 }

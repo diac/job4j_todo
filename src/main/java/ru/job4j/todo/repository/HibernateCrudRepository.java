@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +52,21 @@ public class HibernateCrudRepository implements CrudRepository {
     public <T> List<T> query(String query, Class<T> cl, Map<String, Object> args) {
         Function<Session, List<T>> command = session -> {
             var sq = session.createQuery(query, cl);
+            for (Map.Entry<String, Object> arg : args.entrySet()) {
+                sq.setParameter(arg.getKey(), arg.getValue());
+            }
+            return sq.list();
+        };
+        return tx(command);
+    }
+
+    @Override
+    public <T> List<T> query(String query, Class<T> cl, Map<String, Collection<?>> collectionArgs, Map<String, Object> args) {
+        Function<Session, List<T>> command = session -> {
+            var sq = session.createQuery(query, cl);
+            for (Map.Entry<String, Collection<?>> arg : collectionArgs.entrySet()) {
+                sq.setParameterList(arg.getKey(), arg.getValue());
+            }
             for (Map.Entry<String, Object> arg : args.entrySet()) {
                 sq.setParameter(arg.getKey(), arg.getValue());
             }
