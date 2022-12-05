@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Category;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Репозиторий, отвечающий за сериализацию/десериализацию объектов модели Category в БД
