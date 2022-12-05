@@ -7,12 +7,12 @@ import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.repository.TaskRepository;
+import ru.job4j.todo.util.DateAdjustment;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 
 /**
  * Сервис, осуществляющий доступ к данным объектов модели Task в репозитории
@@ -47,13 +47,8 @@ public class SimpleTaskService implements TaskService {
     @Override
     public List<Task> findAll(ZoneId zoneId) {
         List<Task> tasks = findAll();
-        tasks.forEach(task ->
-                task.setCreated(
-                        task.getCreated()
-                                .atZone(TimeZone.getDefault().toZoneId())
-                                .withZoneSameInstant(zoneId)
-                                .toLocalDateTime()
-                )
+        tasks.forEach(task -> task.setCreated(
+                DateAdjustment.adjustByZoneId(task.getCreated(), zoneId))
         );
         return tasks;
     }
@@ -80,13 +75,8 @@ public class SimpleTaskService implements TaskService {
     @Override
     public List<Task> findAllByDone(boolean done, ZoneId zoneId) {
         List<Task> tasks = findAllByDone(done);
-        tasks.forEach(task ->
-                task.setCreated(
-                        task.getCreated()
-                                .atZone(TimeZone.getDefault().toZoneId())
-                                .withZoneSameInstant(zoneId)
-                                .toLocalDateTime()
-                )
+        tasks.forEach(task -> task.setCreated(
+                DateAdjustment.adjustByZoneId(task.getCreated(), zoneId))
         );
         return tasks;
     }
@@ -114,11 +104,8 @@ public class SimpleTaskService implements TaskService {
     @Override
     public Optional<Task> findById(int id, ZoneId zoneId) {
         Optional<Task> task = findById(id);
-        task.ifPresent(value -> value.setCreated(
-                value.getCreated()
-                        .atZone(TimeZone.getDefault().toZoneId())
-                        .withZoneSameInstant(zoneId)
-                        .toLocalDateTime()
+        task.ifPresent(foundTask -> foundTask.setCreated(
+                DateAdjustment.adjustByZoneId(foundTask.getCreated(), zoneId)
         ));
         return task;
     }
