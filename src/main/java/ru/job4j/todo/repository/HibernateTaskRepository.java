@@ -125,11 +125,9 @@ public class HibernateTaskRepository implements TaskRepository {
             Priority priority,
             Set<Category> categories
     ) {
-        boolean result;
+        boolean result = false;
         Optional<Task> task = findById(id);
-        if (task.isEmpty()) {
-            throw new IllegalArgumentException(String.format("Задача %d не существует", id));
-        } else {
+        if (task.isPresent()) {
             task.get().setDescription(description);
             task.get().setPriority(priority);
             task.get().setCategories(categories);
