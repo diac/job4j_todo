@@ -6,6 +6,9 @@ import java.util.TimeZone;
 
 public final class DateAdjustment {
 
+    private DateAdjustment() {
+    }
+
     public static LocalDateTime adjustByZoneId(LocalDateTime localDateTime, ZoneId zoneId) {
         return localDateTime
                 .atZone(TimeZone.getDefault().toZoneId())
